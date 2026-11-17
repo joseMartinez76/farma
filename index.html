@@ -2,56 +2,80 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1720">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Ruta farmacias</title>
 <style>
-  :root{--bg:#0f1720;--card:#18232f;--txt:#e8eef4;--mut:#8aa0b4;--acc:#2ecc71;--urg:#ff6b5b;}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);padding:16px;max-width:560px;margin:auto}
-  h1{font-size:1.3rem;margin:4px 0 2px}
-  p.sub{color:var(--mut);margin:0 0 14px;font-size:.9rem}
-  textarea{width:100%;min-height:170px;background:var(--card);color:var(--txt);border:1px solid #2a3a4a;border-radius:10px;padding:12px;font-size:1rem}
-  .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  button,a.btn{flex:1;min-width:140px;border:0;border-radius:10px;padding:14px;font-size:1rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none}
+  :root{--bg:#0f1720;--card:#18232f;--line:#2a3a4a;--txt:#e8eef4;--mut:#8aa0b4;--acc:#2ecc71;--urg:#ff6b5b;
+        --sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0 auto;max-width:600px;min-height:100dvh;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+       background:var(--bg);color:var(--txt);line-height:1.35;
+       padding:calc(14px + var(--st)) calc(14px + var(--sr)) calc(96px + var(--sb)) calc(14px + var(--sl))}
+  h1{font-size:clamp(1.25rem,5vw,1.6rem);margin:2px 0}
+  p.sub{color:var(--mut);margin:0 0 12px;font-size:.95rem}
+  /* 16px en campos: evita que el iPhone haga zoom al tocar */
+  textarea,input[type=text]{width:100%;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+  textarea{min-height:38dvh;resize:vertical}
+  textarea:focus,input:focus{outline:2px solid var(--acc);border-color:transparent}
+  label{display:block;font-size:.85rem;color:var(--mut);margin:12px 0 4px}
+  .hint{color:var(--mut);font-size:.85rem;margin-top:6px}
+  button,a.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:54px;border:0;border-radius:14px;
+       padding:12px;font-size:1.05rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit}
+  button:active,a.btn:active{transform:scale(.98)}
+  button:disabled{opacity:.6}
   .pri{background:var(--acc);color:#04210f}
-  .sec{background:#2a3a4a;color:var(--txt)}
-  .hint{color:var(--mut);font-size:.82rem;margin-top:6px}
-  #estado{margin:14px 0;color:var(--mut);min-height:1.2em}
-  ol{padding:0;list-style:none;counter-reset:n}
-  li{background:var(--card);border-radius:10px;padding:12px 12px 12px 48px;margin-bottom:8px;position:relative;counter-increment:n}
-  li::before{content:counter(n);position:absolute;left:12px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#04210f;font-weight:700;display:grid;place-items:center}
+  .sec{background:var(--line);color:var(--txt)}
+  /* Barra de botones fija abajo, a mano del pulgar */
+  .barra{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;gap:8px;max-width:600px;margin:0 auto;
+       padding:10px calc(14px + var(--sr)) calc(10px + var(--sb)) calc(14px + var(--sl));
+       background:linear-gradient(to top,var(--bg) 75%,transparent)}
+  .barra > *{flex:1}
+  #estado{margin:14px 0 8px;color:var(--mut);min-height:1.3em;font-size:.95rem}
+  ol{padding:0;margin:0;list-style:none;counter-reset:n}
+  li{background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;counter-increment:n;
+     display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;align-items:start}
+  li::before{content:counter(n);grid-row:1 / span 3;width:30px;height:30px;border-radius:50%;background:var(--acc);color:#04210f;font-weight:800;display:grid;place-items:center}
   li.urg::before{background:var(--urg);color:#fff}
-  li .t{color:var(--mut);font-size:.85rem;margin-top:3px}
-  li .d{color:var(--mut);font-size:.78rem}
+  li b{grid-column:2;word-break:break-word}
+  li .t{grid-column:2;color:var(--mut);font-size:.88rem}
+  li .d{grid-column:2;color:var(--mut);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  li a.ir{grid-column:3;grid-row:1 / span 3;align-self:center;background:var(--line);color:var(--txt);text-decoration:none;
+     border-radius:12px;padding:0 14px;min-height:44px;display:grid;place-items:center;font-weight:700;font-size:.95rem}
   .err{color:var(--urg)}
-  input[type=text]{width:100%;background:var(--card);color:var(--txt);border:1px solid #2a3a4a;border-radius:10px;padding:10px;font-size:.95rem}
-  label{font-size:.85rem;color:var(--mut)}
+  .oculto{display:none!important}
+  /* Pantallas muy estrechas */
+  @media (max-width:360px){ body{padding-left:10px;padding-right:10px} li{grid-template-columns:28px 1fr} li a.ir{grid-column:2;grid-row:auto;margin-top:6px} }
+  /* Móvil en horizontal: textarea más bajo */
+  @media (max-height:480px){ textarea{min-height:120px} }
 </style>
 </head>
 <body>
 <h1>🚗 Ruta farmacias</h1>
-<p class="sub">Escribe un destino por línea y te los ordeno desde donde estás.</p>
+<p class="sub">Un destino por línea y te los ordeno desde donde estás.</p>
 
-<textarea id="destinos" placeholder="Farmacia López, Calle Colón 20, Valencia
+<section id="entrada">
+<textarea id="destinos" enterkeyhint="enter" autocapitalize="sentences" placeholder="Farmacia López, Calle Colón 20, Valencia
 !Av. del Puerto 150, Valencia
 Calle Sueca 45, Valencia
 Plaza de la Reina 1, Valencia
 Calle Mayor 10, Paterna"></textarea>
-<div class="hint">Pon <b>!</b> delante si es urgente: va primero. Cuanta más dirección pongas (calle, número, pueblo), mejor la encuentra.</div>
+<div class="hint">Pon <b>!</b> delante si es urgente: va primero. Calle, número y pueblo = menos fallos.</div>
 
-<div style="margin-top:10px">
-  <label for="ciudad">Ciudad por defecto (se añade si no pones pueblo)</label>
-  <input type="text" id="ciudad" value="Valencia">
-</div>
+<label for="ciudad">Ciudad por defecto (si no pones pueblo)</label>
+<input type="text" id="ciudad" value="Valencia" autocomplete="address-level2">
+</section>
 
-<div class="row">
-  <button class="pri" id="go">📍 Organizar desde aquí</button>
-</div>
-
-<div id="estado"></div>
+<div id="estado" aria-live="polite"></div>
 <ol id="lista"></ol>
-<div class="row" id="acciones" style="display:none">
-  <a class="btn pri" id="maps" target="_blank" rel="noopener">Abrir ruta en Google Maps</a>
+
+<div class="barra">
+  <button class="sec oculto" id="editar">✏️ Editar</button>
+  <button class="pri" id="go">📍 Organizar desde aquí</button>
+  <a class="btn pri oculto" id="maps" target="_blank" rel="noopener">🗺️ Abrir en Maps</a>
 </div>
 
 <script>
@@ -145,13 +169,25 @@ function heuristica(M, indices, inicio){
 const fmtMin = s => s < 3600 ? `${Math.round(s/60)} min` : `${Math.floor(s/3600)} h ${Math.round(s%3600/60)} min`;
 const fmtKm = m => `${(m/1000).toFixed(1)} km`;
 
+const ver = (id, si) => $(id).classList.toggle('oculto', !si);
+function modoEditar(){
+  ver('entrada',true); ver('go',true); ver('editar',false); ver('maps',false);
+  $('lista').innerHTML=''; estado('');
+}
+function modoRuta(){
+  ver('entrada',false); ver('go',false); ver('editar',true); ver('maps',true);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('editar').onclick = modoEditar;
+
 $('go').onclick = async () => {
-  $('lista').innerHTML=''; $('acciones').style.display='none';
+  $('lista').innerHTML=''; ver('maps',false);
+  $('go').disabled = true; document.activeElement && document.activeElement.blur();
   const ciudad = $('ciudad').value.trim();
   const lineas = $('destinos').value.split('\n').map(s=>s.trim()).filter(Boolean);
   store.set('rf_destinos', $('destinos').value); store.set('rf_ciudad', ciudad);
-  if(lineas.length < 1) return estado('Escribe al menos un destino.', true);
-  if(lineas.length > 23) return estado('Máximo 23 destinos de golpe.', true);
+  if(lineas.length < 1){ $('go').disabled=false; return estado('Escribe al menos un destino.', true); }
+  if(lineas.length > 23){ $('go').disabled=false; return estado('Máximo 23 destinos de golpe.', true); }
 
   try{
     estado('📍 Buscando tu ubicación…');
@@ -185,7 +221,8 @@ $('go').onclick = async () => {
       totT += t[prev][i]; totD += d[prev][i];
       html += `<li class="${p.urg?'urg':''}"><b>${p.urg?'🚨 ':''}${p.texto}</b>
         <div class="t">🚗 ${fmtMin(t[prev][i])} · ${fmtKm(d[prev][i])} desde la anterior</div>
-        <div class="d">${p.nombre}</div></li>`;
+        <div class="d">${p.nombre}</div>
+        <a class="ir" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}&travelmode=driving" target="_blank" rel="noopener">Ir ➜</a></li>`;
       prev = i;
     }
     $('lista').innerHTML = html;
@@ -197,9 +234,11 @@ $('go').onclick = async () => {
     const wps = paradas.slice(0,-1).map(ll).join('|');
     $('maps').href = `https://www.google.com/maps/dir/?api=1&origin=${ll(yo)}&destination=${ll(destino)}`
       + (wps ? `&waypoints=${encodeURIComponent(wps)}` : '') + '&travelmode=driving';
-    $('acciones').style.display='flex';
+    modoRuta();
   }catch(e){
     estado(e.message || 'Algo ha fallado', true);
+  }finally{
+    $('go').disabled = false;
   }
 };
 </script>
